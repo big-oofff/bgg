@@ -1,0 +1,427 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\geometry{a4paper, margin=1in}
+
+\title{Analysis of Factors Influencing Board Game Ownership}
+\author{Thomas Xiao}
+\date{December 22, 2024}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper analyzes a dataset of board games to investigate the factors that impact user ownership. Using multiple regression analysis, correlation matrices, and advanced feature analysis, I explore the influence of variables such as the number of players, playtime, age rating, user ratings, and game complexity. The study aims to understand how these features contribute to the popularity and ownership of board games, providing actionable insights for developers.
+\end{abstract}
+
+% Keywords Section
+\textbf{Keywords:} Board games, ownership analysis, complexity, playtime, visibility, predictive modeling, gradient boosting model.
+
+
+\section{Background}
+A board game consists of any game played on a board, typically one that involves the movement and placing of pieces in different positions to achieve a strategic advantage. Classic examples include chess, checkers, and Monopoly. In recent years, board games have experienced a revival, with players rating and reviewing games on platforms like BoardGameGeek (BGG) \cite{pitt_board_games}, especially during times such as COVID, in which people sought at-home entertainment and social interaction. All of this culminated in the world board game market to be valued at \$20 billion, a number that is expected to nearly double by 2028 \cite{oakpark_boardgames}. As the market grows, understanding what drives ownership can help developers optimize game designs for broader appeal. Researchers have explored various factors influencing board game ownership and purchase intentions. For example, Kosa and Spronck \cite{modern_board_games} examined the purchase intentions for modern board games, finding that enjoyment, positive word of mouth, age, and gender were positively associated with purchase decisions, while factors like income, play frequency, prior board gaming experience, and feelings of presence had no significant impact. Building on this, d'Astous \cite{consumer_appreciation_board_game} concluded that the success of a board game relies on its ability to deliver a unique and immersive play experience while fostering player interaction. However, I analyze factors more specific to the board games themselves, such as game complexity and player count.
+
+\section{Methodology}
+\subsection{Dataset Overview}
+The dataset, sourced from Kaggle \cite{samarasinghe_dataset}, contains over 20,000 entries with attributes such as year of publication, player count, playtime, age rating, user ratings, game complexity, and the number of owned users. These features provide a comprehensive basis for analyzing the factors influencing board game ownership, with the number of owned users serving as the target variable.
+
+\subsection{Dataset Variables} 
+The dataset includes many variables, in which the relevant ones for this paper are:
+\begin{itemize}
+    \item Year Published
+    \item Minimum and Maximum Players
+    \item Play Time (in minutes)
+    \item Minimum Age
+    \item Users Rated
+    \item Rating Average (on a scale from 1 - 10)
+    \item BGG Ranking
+    \item Complexity Average (on a scale from 1 - 5 with 5 being extremely complex to play)
+    \item Owned Users (target variable)
+\end{itemize}
+
+\subsection{Data Cleaning and Preprocessing}
+Data cleaning involved handling missing values and ensuring consistency. Missing values in the Year Published column were filled with the median year, while other columns were converted to appropriate data types. Additionally, two separate analyses were conducted: one including rating-related variables (Users Rated, Rating Average, and BGG Ranking) and another excluding them. This approach allows us to evaluate the impact of these variables while also exploring the influence of intrinsic game attributes.
+
+\section{Statistical Methods}
+To analyze the factors influencing ownership, several statistical techniques were employed:
+
+\subsubsection*{Correlation Heatmap}
+Correlation heatmaps visually display the strength of relationships between variables. They help identify key interactions, such as the strong correlation between Users Rated and Owned Users, which highlights the impact of user engagement on game ownership.
+
+\subsubsection*{Random Forest Regression}
+Random Forest regression is an ensemble learning method that builds multiple decision trees to predict outcomes. It identifies influential variables even in the presence of nonlinear relationships.
+
+\subsubsection*{Lasso Regression}
+Lasso regression applies a penalty term to reduce the impact of less important variables, performing feature selection by setting some coefficients to zero. This method highlights influential variables while minimizing noise from less significant factors.
+
+\section{Analysis and Results}
+\subsection{Correlation Heatmaps}
+Figure 1 demonstrates a strong positive correlation (0.99) between Users Rated and Owned Users, indicating that visibility and user engagement are extremely critical drivers of ownership. In contrast, Rating Average shows a weaker correlation (0.18), suggesting that game quality actually plays a secondary role compared to visibility under a purchasing context. Interestingly, BGG Ranking exhibits a moderate negative correlation (-0.33) with Owned Users, meaning that games with better (lower on a first to last numerical scale) rankings tend to have higher ownership. However, the correlation is not strong, indicating a difference in opinion between critics and the average consumer. This underscores the impact of perceived reputation and popularity on user acquisition. Beyond Owned Users, other high correlations reveal important dynamics. For instance, Rating Average has a strong negative correlation (-0.74) with BGG Ranking, indicating that games with higher average rating tend to achieve better rankings, likely due to increased visibility and community engagement. In the context of gameplay elements, Complexity Average shows a moderate positive correlation (0.48) with Rating Average, suggesting that more complex games tend to have higher average ratings, while also showing a moderate negative correlation (-0.38) with BGG Rank, indicating a similar conclusion of a preference for more complex games.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{heatmapinclude.png}
+\caption{Correlation Heatmap Including Rating Variables}
+\label{fig:heatmap_include}
+\end{figure}
+
+When rating-related variables are excluded, as shown in Figure 2, Complexity Average emerges as the most correlated intrinsic feature (0.28). This indicates that while complexity contributes to ownership, its effect is relatively minor compared to engagement-driven variables.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{heatmapexclude.png}
+\caption{Correlation Heatmap Excluding Rating Variables}
+\label{fig:heatmap_exclude}
+\end{figure}
+
+\subsection{Lasso Regression Results}
+The Lasso regression coefficients reaffirm the dominance of Users Rated as a predictor of ownership, underscoring the critical role of visibility and user engagement. Including rating-related variables (Figure 3) highlights the overwhelming importance of visibility metrics such as Users Rated. Specifically, Users Rated exhibits the largest coefficient, indicating its direct influence on ownership, while BGG Ranking—though inversely correlated with Owned Users—also plays a role in determining visibility and perceived popularity. This finding emphasizes the need for developers to actively engage with online communities to enhance a game's visibility and encourage rating frequency. Excluding rating-related variables (Figure 4) shifts the focus to intrinsic game attributes. Here, Complexity Average and Minimum Age emerge as the most influential predictors. Complexity Average, which reflects the strategic depth of a game, positively correlates with ownership, particularly for more dedicated audiences who value engaging gameplay experiences. However, the significance of Minimum Age implies that games accessible to younger audiences may have broader appeal, possibly due to their suitability for families or casual gamers. Additionally, Play Time also shows a moderate influence, suggesting that games with shorter or moderate playtimes are more likely to attract a wider range of players, as excessively long games may deter casual audiences. This shift in significant predictors highlights a key insight: while visibility metrics dominate when included, intrinsic game attributes like complexity, accessibility, and playtime become critical in their absence. This implies that for developers, increasing visibility should be a top priority; however, crafting games with an appropriate balance of complexity, accessibility, and playtime is also essential to ensure appeal and long-term retention across different demographics. 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{lassoinclude.png}
+\caption{Lasso Regression Coefficients Including Rating Variables}
+\label{fig:lasso_include}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{lassoexclude.png}
+\caption{Lasso Regression Coefficients Excluding Rating Variables}
+\label{fig:lasso_exclude}
+\end{figure}
+
+\subsection{Random Forest Feature Importance}
+Random Forest analysis further underscores the overwhelming importance of Users Rated, with an importance score near 1 (Figure 5). This reaffirms that visibility, as captured by the number of user ratings on platforms like BoardGameGeek, is the primary driver of ownership. Users Rated serves as a direct proxy for exposure and community engagement, suggesting that games with higher levels of interaction and user feedback gain greater traction among audiences. Noticeably, BGG Rank is nowhere near considered important. When rating-related variables are excluded (Figure 6), intrinsic features such as Complexity Average and Year Published emerge as significant predictors of ownership. Complexity Average is particularly noteworthy, highlighting that games with strategic depth and engaging mechanics appeal strongly to dedicated gamers who are willing to invest time and effort into understanding more complex gameplay. This aligns with previous insights, where a balance between complexity and accessibility is vital for maximizing appeal across different audience demographics. Interestingly, Year Published also emerges as a key predictor in the absence of rating-related variables. This suggests that modern games benefit from contemporary design trends, innovative mechanics, and active marketing campaigns, which resonate with players seeking fresh and up-to-date gaming experiences. However, the importance of Year Published also indicates that older games with sustained appeal and strong word-of-mouth may still hold a considerable audience base, particularly if they are considered classics, especially with older games such as chess and checkers. Play Time shows moderate importance, reinforcing its role as a secondary yet relevant factor in influencing ownership. Games with shorter or moderate playtimes are generally more accessible to casual players, while excessively long playtimes may cater more specifically to niche audiences of dedicated gamers. This highlights the need for developers to strike a balance in playtime duration to ensure broad appeal while retaining depth. Overall, the Random Forest analysis provides nuanced insights into the interplay between visibility metrics and intrinsic attributes. While visibility metrics dominate ownership predictions when included, intrinsic factors such as complexity, recency, and accessibility become critical when evaluating games in isolation. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{featureinclude.png}
+\caption{Feature Importance (Random Forest Including Rating Variables)}
+\label{fig:rf_include}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{featureexclude.png}
+\caption{Feature Importance (Random Forest Excluding Rating Variables)}
+\label{fig:rf_exclude}
+\end{figure}
+
+% \section{Predictive Function and Optimization}
+% \subsection{Motivation for the Non-Linear Objective Function}
+% In this area of analysis, an attempt is made to determine optimal gameplay characteristics to maximize number of users.  The number of Owned Users (our target variable) is influenced by multiple factors, including Complexity Average and Play Time. A non-linear function is used in the objective function \( f(x) \) to better capture the realistic behavior of factors influencing ownership, such as diminishing returns and interactions between variables. Real-world relationships between features like Complexity Average, Play Time, and ownership are rarely linear. This approach is particularly appropriate for the following reasons:
+
+% \paragraph{Diminishing Returns.}
+% Quadratic terms with negative coefficients (e.g., \(-\gamma_1 \cdot (\text{Complexity Average})^2\)) model diminishing returns, where the marginal benefit of increasing a feature decreases as it reaches higher levels. For example:
+% \begin{itemize}
+%     \item Complexity Average: While increased complexity makes games more appealing to strategic players, excessive complexity can alienate casual players, reducing ownership.
+%     \item Play Time: Moderate play times attract both casual and dedicated players, but longer play times reduce accessibility, particularly for casual audiences.
+% \end{itemize}
+
+% \paragraph{Interactions Between Variables.}
+% Interaction terms (e.g., \(\delta_1 \cdot \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot (\text{Complexity Average} \cdot \text{Play Time})^2}\)) capture synergies or trade-offs between features. For instance:
+% \begin{itemize}
+%     \item A complex game with moderate play time may appeal to strategic players, but excessive playtime combined with high complexity can deter ownership.
+%     \item A simple game with short play time may attract casual players, but it may fail to hold the interest of dedicated gamers.
+% \end{itemize}
+
+% \paragraph{Practical Utility.}
+% A non-linear objective function reflects more realistic trade-offs, allowing developers to fine-tune parameters while avoiding oversimplified linear assumptions. The quadratic terms ensure that optimal values do not simply align with the upper bounds of constraints but instead reflect a balance between competing factors.
+
+% \subsection{The Objective Function}
+% The modified objective function \( f(x) \) incorporates quadratic terms for diminishing returns and interaction terms for synergies:
+% \[
+% \begin{split}
+% f(x) = & \, \beta_0 + \beta_1 \cdot \text{Complexity Average} 
+% - \gamma_1 \cdot (\text{Complexity Average})^2 \\
+% & + \beta_2 \cdot \text{Play Time} 
+% - \gamma_2 \cdot (\text{Play Time})^2 
+% + \delta_1 \cdot \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot (\text{Complexity Average} \cdot \text{Play Time})^2}
+% \end{split}
+% \]
+
+% The terms in the objective function are defined as:
+% \begin{itemize}
+%     \item \( \beta_0 \): The intercept term of the function, representing the baseline ownership level when all other variables (Complexity Average and Play Time) are set to zero. This term captures the inherent popularity of board games that cannot be attributed to the specific features being analyzed.
+%     \item \( \beta_1 \): The linear contribution of Complexity Average to ownership.
+%     \item \( -\gamma_1 \cdot (\text{Complexity Average})^2 \): Captures diminishing returns for Complexity Average.
+%     \item \( \beta_2 \): The linear contribution of Play Time to ownership.
+%     \item \( -\gamma_2 \cdot (\text{Play Time})^2 \): Captures diminishing returns for Play Time.
+%     \item \( \delta_1 \cdot \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot (\text{Complexity Average} \cdot \text{Play Time})^2} \): Models the interaction effect between Complexity Average and Play Time with saturation effects, ensuring realistic behavior at high values.
+%     \item \( \gamma_1, \gamma_2 \): These are coefficients for the quadratic terms that capture diminishing returns for Complexity Average and Play Time, respectively. They represent how quickly the marginal benefit of increasing complexity or playtime decreases as these features reach higher levels. Larger values of \( \gamma_1 \) or \( \gamma_2 \) indicate more rapid diminishing returns.
+    
+%     \item \( \delta_1 \): This coefficient controls the interaction term, capturing the synergistic or compounding effects between Complexity Average and Play Time. A higher \( \delta_1 \) value implies that the interaction between these two features significantly influences ownership, either positively or negatively. This term accounts for how the combined effect of complexity and playtime behaves in practice, ensuring realistic saturation at high values.
+% \end{itemize}
+
+% \subsection{Optimization with Constraints}
+% To maximize ownership, developers must balance features while satisfying constraints reflecting real-world design limitations:
+
+% \[
+% g(x): 2 \cdot \text{Complexity Average} + 1.5 \cdot \text{Play Time} + 
+% \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot \text{Complexity Average}} \leq 180, 
+% \]
+% \[
+% \text{Complexity Average} \leq 5, \quad \text{Play Time} \leq 180
+% \]
+
+
+
+
+% \begin{itemize}
+%     \item \textbf{\(2 \cdot \text{Complexity Average}\):} 
+%     This coefficient reflects the heavier impact of complexity on a player's cognitive load compared to playtime. Complex games require more mental effort for strategizing, processing, and retaining rules, which can lead to fatigue if not balanced. By assigning a weight of \(2\), the model emphasizes the disproportionate cognitive burden that increased complexity imposes on players.
+    
+%     \item \textbf{\(1.5 \cdot \text{Play Time}\):} 
+%     This coefficient indicates that playtime, while significant, contributes less to the cognitive load than complexity. Longer playtimes demand more commitment from players but are less mentally taxing since they often involve repetition of known mechanics rather than continuous problem-solving. The weight of \(1.5\) reflects this balance, acknowledging its importance without overshadowing the effect of complexity.
+
+
+% \subsubsection*{Interaction Term}
+% The term \(\frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot \text{Complexity Average}}\) introduces a realistic interaction between complexity and playtime:
+% \begin{itemize}
+%     \item \textbf{Purpose:} This term models diminishing returns. While moderate levels of both complexity and playtime can enhance player engagement, excessively high values of both simultaneously can overwhelm players, reducing their overall enjoyment.
+%     \item \textbf{Impact of \( \alpha \):} The parameter \( \alpha \) controls the rate of diminishing returns. Higher values of \( \alpha \) cause the interaction term to decrease more rapidly as complexity increases, reflecting faster saturation of the combined effect. Lower values allow for a more gradual decline in interaction benefits.
+% \end{itemize}
+
+% \subsubsection*{Combined Implication}
+% The weights \(2\) for complexity and \(1.5\) for playtime, together with the interaction term, ensure:
+% \begin{itemize}
+%     \item Games with excessive complexity or playtime are penalized more heavily, making it challenging to meet the constraints unless features are balanced carefully.
+%     \item The interaction term discourages designs where both complexity and playtime are high, encouraging developers to optimize games that maintain player engagement without overwhelming them.
+% \end{itemize}
+%     \item \( \text{Complexity Average} \leq 5 \): Reflects the maximum complexity level based on a realistic threshold for broad appeal.
+%     \item \( \text{Play Time} \leq 180 \): Captures the typical upper limit for playtime in popular board games.
+% \end{itemize}
+
+% The Lagrangian for this optimization problem is constructed as follows:
+% \[
+% \begin{split}
+% \mathcal{L} = & \, \beta_0 + \beta_1 \cdot \text{Complexity Average} - \gamma_1 \cdot (\text{Complexity Average})^2 \\
+% & + \beta_2 \cdot \text{Play Time} - \gamma_2 \cdot (\text{Play Time})^2 \\
+% & + \delta_1 \cdot \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot (\text{Complexity Average} \cdot \text{Play Time})^2} \\
+% & - \lambda_1 \left( 2 \cdot \text{Complexity Average} + 1.5 \cdot \text{Play Time} 
+% + \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot \text{Complexity Average}} - 180 \right) \\
+% & - \lambda_2 (\text{Complexity Average} - 5) - \lambda_3 (\text{Play Time} - 180)
+% \end{split}
+% \]
+
+% \subsection{Solving the Optimization Problem}
+% To find the optimal values of the decision variables, solve the following system of equations derived from the updated Lagrangian:
+
+% \[
+% \begin{split}
+% \frac{\partial \mathcal{L}}{\partial \text{Complexity Average}} = & \beta_1 - 2 \gamma_1 \cdot \text{Complexity Average} \\
+% & + \delta_1 \cdot \frac{\text{Play Time}}{1 + \alpha \cdot (\text{Complexity Average} \cdot \text{Play Time})^2} \\
+% & - 2 \lambda_1 - \frac{\lambda_1 \cdot \text{Play Time}}{(1 + \alpha \cdot \text{Complexity Average})^2} - \lambda_2 = 0
+% \end{split}
+% \]
+% \[
+% \begin{split}
+% \frac{\partial \mathcal{L}}{\partial \text{Play Time}} = & \beta_2 - 2 \gamma_2 \cdot \text{Play Time} \\
+% & + \delta_1 \cdot \frac{\text{Complexity Average}}{1 + \alpha \cdot (\text{Complexity Average} \cdot \text{Play Time})^2} \\
+% & - 1.5 \lambda_1 - \frac{\lambda_1 \cdot \text{Complexity Average}}{(1 + \alpha \cdot \text{Complexity Average})^2} - \lambda_3 = 0
+% \end{split}
+% \]
+% \[
+% \frac{\partial \mathcal{L}}{\partial \lambda_1} = 2 \cdot \text{Complexity Average} + 1.5 \cdot \text{Play Time} + \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot \text{Complexity Average}} - 180 = 0
+% \]
+% \[
+% \frac{\partial \mathcal{L}}{\partial \lambda_2} = \text{Complexity Average} - 5 = 0
+% \]
+% \[
+% \frac{\partial \mathcal{L}}{\partial \lambda_3} = \text{Play Time} - 180 = 0
+% \]
+
+% \subsubsection{The Solution}
+% 1. From \(\frac{\partial \mathcal{L}}{\partial \lambda_2}\):
+% \[
+% \text{Complexity Average} = 5
+% \]
+
+% 2. From \(\frac{\partial \mathcal{L}}{\partial \lambda_3}\):
+% \[
+% \text{Play Time} = 180
+% \]
+
+% 3. Substitute these values into the combined constraint:
+% \[
+% \begin{split}
+% \frac{\partial \mathcal{L}}{\partial \lambda_1} = & 2 \cdot \text{Complexity Average} + 1.5 \cdot \text{Play Time} \\
+% & + \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot \text{Complexity Average}} - 180 = 0
+% \end{split}
+% \]
+% \[
+% \begin{split}
+% 2 \cdot 5 + 1.5 \cdot 180 + \frac{5 \cdot 180}{1 + \alpha \cdot 5} - 180 = 0
+% \end{split}
+% \]
+
+% Solving for \(\alpha\), we can adjust the trade-off between complexity and playtime.
+
+% \subsubsection{Implications of the Solution}
+% The solution to the optimization problem provides valuable insights into balancing game design parameters such as complexity and playtime to maximize ownership while satisfying real-world constraints. Below is an expanded analysis of the results and their significance:
+
+% \paragraph{1. Optimal Complexity Average (\( \text{Complexity Average} = 5 \))}
+% \begin{itemize}
+%     \item \textbf{Interpretation:} The optimal value of \( \text{Complexity Average} \) is the maximum allowed by the constraint \( \text{Complexity Average} \leq 5 \). This implies that maximizing the strategic depth and challenge of the game, while staying within a reasonable upper limit, is critical for appealing to players who value engaging and intellectually stimulating games.
+%     \item \textbf{Implication:} Games with \( \text{Complexity Average} = 5 \) are likely to attract more dedicated players, but any increase beyond this value may alienate casual players due to excessive cognitive demands. This aligns with the diminishing returns captured by the quadratic term \( -\gamma_1 \cdot (\text{Complexity Average})^2 \).
+% \end{itemize}
+
+% \paragraph{2. Optimal Play Time (\( \text{Play Time} = 180 \))}
+% \begin{itemize}
+%     \item \textbf{Interpretation:} The optimal playtime is the upper bound of the constraint \( \text{Play Time} \leq 180 \), indicating that longer games (within reason) are generally more appealing to the target audience. Players are willing to invest more time if the game offers sufficient depth and engagement.
+%     \item \textbf{Implication:} The result suggests that developers should design games that maximize playtime up to 180 minutes, ensuring that the game retains interest without becoming overly tedious. This aligns with the quadratic term \( -\gamma_2 \cdot (\text{Play Time})^2 \), which models diminishing returns for excessively long play sessions.
+% \end{itemize}
+
+% \paragraph{3. Interaction Term (\( \alpha \))}
+% \begin{itemize}
+%     \item \textbf{Interpretation:} The parameter \( \alpha \) controls the rate of diminishing returns in the interaction term:
+%     \[
+%     \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot \text{Complexity Average}}
+%     \]
+%     Higher values of \( \alpha \) cause the interaction term to decrease more rapidly as complexity increases, reflecting faster saturation of the combined effect of complexity and playtime. Conversely, lower values allow for a more gradual decline in interaction benefits, indicating that the combined effect of these variables is sustainable for longer durations.
+%     \item \textbf{Implication:} The interaction term ensures that neither complexity nor playtime disproportionately dominates the game design. Developers should aim to balance both features to maintain player engagement without overwhelming them.
+% \end{itemize}
+
+% \paragraph{4. Role of Lagrange Multipliers (\( \lambda_1, \lambda_2, \lambda_3 \))}
+% \begin{itemize}
+%     \item \( \lambda_1 \): Reflects the sensitivity of the objective function to the combined constraint:
+%     \[
+%     2 \cdot \text{Complexity Average} + 1.5 \cdot \text{Play Time} + \frac{\text{Complexity Average} \cdot \text{Play Time}}{1 + \alpha \cdot \text{Complexity Average}} \leq 180
+%     \]
+%     A high value of \( \lambda_1 \) indicates that the combined cognitive load of complexity and playtime is a critical factor for ownership, necessitating careful balance between these variables.
+%     \item \( \lambda_2 \): Reflects the sensitivity of the objective function to the complexity constraint \( \text{Complexity Average} \leq 5 \). A high \( \lambda_2 \) suggests that further increasing complexity would disproportionately reduce ownership, highlighting the importance of staying within the limit.
+%     \item \( \lambda_3 \): Reflects the sensitivity of the objective function to the playtime constraint \( \text{Play Time} \leq 180 \). A high \( \lambda_3 \) indicates that longer playtimes may exceed the threshold of player commitment, reducing ownership.
+% \end{itemize}
+
+% \paragraph{Combined Implications:}
+% The updated constraints and interaction terms provide a more realistic framework for optimization:
+% \begin{itemize}
+%     \item The interaction term captures diminishing returns, ensuring that increases in complexity or playtime beyond certain thresholds do not disproportionately influence ownership.
+%     \item The higher-degree constraint highlights the compounding effects of combining high complexity and long playtime, ensuring that designs are optimized for diverse player preferences.
+%     \item Developers can use this framework to adjust game parameters dynamically, aligning design choices with player expectations and market trends.
+% \end{itemize}
+
+\section{Predictive Model Analysis}
+\subsection{Gradient Boosting Model Development}
+A Gradient Boosting Model (GBM) was developed to predict the logarithmically scaled number of owned users based on Complexity Average, Play Time, Users Rated, Minimum Age, and Year Published. These variables were selected to capture both intrinsic attributes and engagement-driven metrics. The dataset was split into training and validation sets, with 80\% used to train and 20\% used to test, and log scaling was applied to the target variable to better account for the wide range of ownership values.
+
+\subsection{Gradient Boosting Model Function}
+The predicted values in the Gradient Boosting Model are computed by combining the outputs of a series of decision trees. The general function used for the predictions is given by:
+
+\[
+\hat{y} = F_M(x) = \sum_{m=1}^M \nu \cdot h_m(x)
+\]
+
+Where:
+\begin{itemize}
+    \item \( \hat{y} \): The predicted value for a given input \( x \), computed in the log-transformed space.
+    \item \( F_M(x) \): The overall prediction after \( M \) boosting iterations (the combined result of all trees).
+    \item \( M \): The total number of trees (iterations) used in the model.
+    \item \( \nu \): The learning rate, a scaling factor that controls the contribution of each tree to the overall prediction.
+    \item \( h_m(x) \): The prediction made by the \( m \)-th decision tree for the input \( x \).
+\end{itemize}
+
+\subsubsection{The Process}
+\begin{enumerate}
+    \item \textbf{Initialization}: The model initializes the predicted values to a constant value, typically the mean of the target variable (\( \bar{y} \)) in the log-transformed space:
+    \[
+    F_0(x) = \log(\bar{y})
+    \]
+    
+    \item \textbf{Iterative Improvement}: At each iteration \( m \), the model:
+    \begin{itemize}
+        \item Fits a decision tree \( h_m(x) \) to the negative gradient of the loss function (the residuals from the previous iteration). This captures the direction in which predictions should be adjusted to minimize the error.
+        \item Updates the overall prediction by adding the scaled output of the tree:
+        \[
+        F_m(x) = F_{m-1}(x) + \nu \cdot h_m(x)
+        \]
+    \end{itemize}
+
+    \item \textbf{Final Prediction}: After \( M \) iterations, the final prediction is the sum of the initial prediction and the weighted outputs of all the trees:
+    \[
+    F_M(x) = F_0(x) + \sum_{m=1}^M \nu \cdot h_m(x)
+    \]
+    The final prediction is then transformed back from the logarithmic space using:
+    \[
+    \hat{y}_{\text{final}} = \exp(F_M(x))
+    \]
+\end{enumerate}
+
+\subsubsection{Application to Ownership Prediction}
+In this study, the Gradient Boosting Model predicts the number of owned users (\( \hat{y} \)) using the following input features:
+\begin{itemize}
+    \item Complexity Average
+    \item Play Time
+    \item Users Rated
+    \item Minimum Age
+    \item Year Published
+\end{itemize}
+
+The model minimizes the loss function (e.g., Mean Squared Error) by iteratively computing residuals and fitting decision trees. The final prediction for ownership is the sum of the contributions from all the trees, scaled by the learning rate \( \nu \). The results are shown in the table below:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Metric} & \textbf{Training Set} & \textbf{Validation Set} \\
+\hline
+MAE & 199.64 & 241.02 \\
+RMSE & 532.80 & 765.20 \\
+\( R^2 \) Score & 0.989 & 0.975 \\
+\hline
+\end{tabular}
+\caption{Performance Metrics of the Gradient Boosting Model with Log Scaling}
+\label{table:model_metrics}
+\end{table}
+
+\paragraph{Explanation of Metrics:}
+\begin{itemize}
+    \item \textbf{Mean Absolute Error (MAE):} This metric measures the average absolute difference between the predicted and actual values. For the training set, the MAE is 199.64, indicating the average error in predicting ownership is approximately 200 users. The slightly higher MAE of 241.02 on the validation set suggests good generalization with minimal overfitting.
+    \item \textbf{Root Mean Squared Error (RMSE):} RMSE penalizes larger deviations more heavily than MAE. The RMSE values of 532.80 (training) and 765.20 (validation) reflect the complexity of real-world ownership patterns and the model's ability to capture them.
+    \item \textbf{\( R^2 \) Score:} The \( R^2 \) scores of 0.989 (training) and 0.975 (validation) indicate that the model explains most of the variance in ownership, showcasing strong predictive capability.
+\end{itemize}
+
+\subsection{Predicted vs Actual Values}
+To validate the model's accuracy, predicted ownership values were compared to actual values from the dataset. The close alignment between predicted and actual results demonstrates the reliability of the GBM in capturing relevant ownership trends.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{predicted_vs_actual_adjusted_scale.png}
+\caption{Predicted vs Actual Number of Owned Users (Log Scaling Applied)}
+\label{fig:predicted_vs_actual}
+\end{figure}
+
+\paragraph{Discrepancy for Large Values:}
+While the log scaling significantly improves model accuracy and alignment for most data points, discrepancies may still exist for games with extremely large ownership numbers. This is due to the inherent skew in the dataset and the limitations of the log transformation in fully capturing extreme outliers. Developers should interpret predictions for such cases with caution and consider further analysis.
+
+
+\section{Conclusion}
+This study provides a comprehensive analysis of the factors influencing board game ownership by combining statistical methods, optimization frameworks, and predictive modeling. Through the use of correlation heatmaps, Lasso regression, and Random Forest analysis, the study identified key drivers of ownership, including user engagement metrics (such as Users Rated) and intrinsic game attributes (such as Complexity Average and Play Time). The findings highlight the critical role of visibility in driving ownership, while also emphasizing the importance of balancing gameplay features to appeal to diverse audiences. A Gradient Boosting Model (GBM) was employed, leveraging historical data to predict ownership with high accuracy. The GBM successfully captured non-linear relationships and feature interactions, demonstrating strong predictive capabilities (\(R^2 = 0.975\) on the validation set) and providing actionable insights for game design. The implications of this study are significant for developers. By prioritizing visibility and user engagement through strategies such as community-driven marketing and user reviews, developers can enhance the appeal of their games. Additionally, the insights into optimal feature ranges, such as maintaining moderate complexity and playtime, enable developers to design games that balance accessibility and depth. The use of advanced modeling techniques, such as GBMs, further empowers developers to test hypothetical designs, optimize feature interactions, and tailor games to specific market segments. In conclusion, this study bridges the gap between theoretical optimization and practical predictive modeling, offering a robust framework for understanding and maximizing board game ownership. Future research could expand on this work by incorporating additional variables, such as production quality or marketing budget, and exploring new methodologies to refine predictions and enhance game design strategies.
+
+
+
+\bibliographystyle{unsrt}
+\begin{thebibliography}{9}
+
+\bibitem{pitt_board_games}
+Zachary Horton, The Rise of Board Games in Today’s Tech-Dominated Culture, \textit{Pittwire}, University of Pittsburgh, April 10, 2020. Available at: \href{https://www.pitt.edu/pittwire/features-articles/rise-board-games-today-s-tech-dominated-culture}{https://www.pitt.edu/pittwire/features-articles/rise-board-games-today-s-tech-dominated-culture}. [Accessed: Oct. 20, 2024].
+
+\bibitem{oakpark_boardgames}
+John Doe, "Board games are making a comeback. Here's why," \textit{Oak Park Talon}, March 10, 2023. Available at: \url{https://oakparktalon.org/16817/feature/board-games-are-making-a-comeback-heres-why/}. [Accessed: Nov. 24, 2024].
+
+\bibitem{modern_board_games}
+Kosa, M., and Spronck, P., "An Exploratory Study on the Purchase Intentions of Modern Board Games," \textit{ResearchGate}, November 2022. Available at: \url{https://www.researchgate.net/publication/365138247_An_Exploratory_Study_on_the_Purchase_Intentions_of_Modern_Board_Games_Purchase_Intentions_of_Modern_Board_Games}. [Accessed: Nov. 24, 2024].
+
+\bibitem{consumer_appreciation_board_game}
+d'Astous, A., "An Inquiry into the Factors that Impact on Consumer Appreciation of a Board Game," \textit{ResearchGate}, January 2012. Available at: \url{https://www.researchgate.net/publication/235265445_An_inquiry_into_the_factors_that_impact_on_consumer_appreciation_of_a_board_game}. [Accessed: Nov. 24, 2024].
+
+\bibitem{samarasinghe_dataset}
+Dilini Samarasinghe, "BoardGameGeek Dataset on Board Games," \textit{IEEE Dataport}, July 5, 2021. doi: \href{https://dx.doi.org/10.21227/9g61-bs59}{https://dx.doi.org/10.21227/9g61-bs59}.
+
+\end{thebibliography}
+
+\end{document}
